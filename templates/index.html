@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Converter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Text Converter</h1>
+    <div class="container">
+        <div class="converter">
+            <h2>TOON to JSON</h2>
+            <form action="/toon-to-json" method="post">
+                <textarea name="toon_text" placeholder="Enter TOON text here...">{{ toon_text }}</textarea>
+                <button type="submit">Convert to JSON</button>
+            </form>
+        </div>
+        <div class="converter">
+            <h2>JSON to TOON</h2>
+            <form action="/json-to-toon" method="post">
+                <textarea name="json_text" placeholder="Enter JSON text here...">{{ json_text }}</textarea>
+                <button type="submit">Convert to TOON</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
