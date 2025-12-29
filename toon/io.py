@@ -34,9 +34,9 @@ def _dumps_helper(data, indent_level=0):
                     lines.append(f"{indent}{key}[0]:")
                     continue
                 inner_keys = ",".join(value[0].keys()) # Assume all dicts have same keys.
-                lines.append(f"{indent}{key}[{len(value)}]{{{inner_keys}}}:")
+                lines.append(f"{indent}{key}[{len(value)}]{{inner_keys}}:")
                 for item in value:
-                    inner_values = ",".join(item.values())
+                    inner_values = ",".join(str(v) for v in item.values())
                     lines.append(f"{indent}  {inner_values}")
             else:
                 # Fallback for mixed lists.
@@ -52,13 +52,33 @@ def dumps(data: dict):
     lines = []
     num_items = len(data)
     for i, (name, attrs) in enumerate(data.items()):
+        is_complex = isinstance(attrs, (dict, list))
+
         if isinstance(attrs, dict):
             lines.append(f"{name}:")
             lines.extend(_dumps_helper(attrs, 1))
+        elif isinstance(attrs, list):
+            if not attrs:
+                lines.append(f"{name}[0]:")
+            elif all(isinstance(i, str) for i in attrs):
+                lines.append(f"{name}[{len(attrs)}]: {', '.join(attrs)}")
+            elif all(isinstance(i, dict) for i in attrs):
+                if attrs:
+                    inner_keys = ",".join(attrs[0].keys())
+                    lines.append(f"{name}[{len(attrs)}]"+"{"+f"{inner_keys}"+"}:")
+                    for item in attrs:
+                        inner_values = ",".join(str(v) for v in item.values())
+                        lines.append(f"  {inner_values}")
+                else:
+                    lines.append(f"{name}[0]:")
+            else:
+                lines.append(f"{name}[{len(attrs)}]:")
+                for item in attrs:
+                    lines.append(f"  - {str(item)}")
         else:
             lines.append(f"{name}: {attrs}")
         
-        if isinstance(attrs, dict) and i < num_items - 1:
+        if is_complex and i < num_items - 1:
             lines.append("")
 
     return "\n".join(lines)
